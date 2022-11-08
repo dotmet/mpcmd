@@ -20,7 +20,7 @@ __version__ = "0.0.1"
 #]
 
 setup(
-    name="PyMPCD&MD",
+    name="PyMPCD_MD",
     version=__version__,
     author="Even Wong",
     author_email="evenwong@stu.cdut.edu.cn",
