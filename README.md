@@ -1,5 +1,5 @@
 # PyMPCD-MD
-A fully extensiable hydrodynamic simulation package
+A fully extensible hydrodynamic simulation package
 
 # Install package
 ```Bash
