@@ -1,0 +1,11 @@
+Metadata-Version: 1.2
+Name: PyMPCD
+Version: 0.0.1
+Summary: A project about mpcd&md.
+Home-page: https://github.com/###
+Author: Even Wong
+Author-email: evenwong@stu.cdut.edu.cn
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Requires-Python: >=3.8
