@@ -24,7 +24,6 @@ ptypeid = [0]*len(position)
 mass = [1.0]*len(position)
 bonds = [[i, i+1] for i in range(N-1)]
 btypeid = [0]*len(bonds)
-# bonds = np.array(bonds)
 hmd.read_polymer_info(mass, position, ptypeid, bonds, btypeid)
 hmd.initialize()
 hmd.bond_fene('b', k=30, r0=1.5, sigma=1.0, epsilon=1.0)
