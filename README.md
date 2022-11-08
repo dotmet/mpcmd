@@ -3,7 +3,7 @@ A hydrodynamic simulation package
 
 # Install package
 ```Bash
-cd PyMPCD&MD
+cd PyMPCD_MD
 pip install .
 ```
 
