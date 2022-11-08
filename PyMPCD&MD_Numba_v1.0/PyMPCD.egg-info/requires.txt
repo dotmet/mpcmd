@@ -1,7 +1,0 @@
-matplotlib
-numpy
-scipy
-numba
-gsd
-memory_profiler
-seaborn
