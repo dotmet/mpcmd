@@ -20,8 +20,8 @@ hmd = Hoomd()
 
 hmd.make_snapshot(mpcd_sys=m, N=N, particle_types=['p'], bond_types=['b'], angle_types=['a'])
 position = [[0, 0, i-5] for i in range(N)]
-ptypeid = [0]*len(position)
-mass = [1.0]*len(position)
+ptypeid = [0]*N
+mass = [1.0]*N
 bonds = [[i, i+1] for i in range(N-1)]
 btypeid = [0]*len(bonds)
 hmd.read_polymer_info(mass, position, ptypeid, bonds, btypeid)
