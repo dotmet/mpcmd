@@ -37,6 +37,7 @@ m.solute.md_sys = hmd
 
 # Save trajectory for MPCD
 #m.logger(period=1000, objects=['fluid'], fnames=['test_fluid.gsd'])
+#m.logger(period=1000, objects=['fluid', 'solute'], fnames=['fluid.gsd', 'solute.gsd'])
 
 # Equibrium
 m.run(1e4, mute=1e3)
