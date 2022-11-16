@@ -12,27 +12,27 @@ __version__ = "0.0.1"
 #   say from a submodule.
 
 #ext_modules = [
-#    Pybind11Extension("topoTools_cpp",
-#        [os.getcwd()+"/pylmp/Model/topoTools.cpp"],
+#    Pybind11Extension("cpp",
+#        [os.getcwd()+"/*.cpp"],
 #        # Example: passing in the version to the compiled code
 #        define_macros = [('VERSION_INFO', __version__)],
 #        ),
 #]
 
 setup(
-    name="PyMPCD_MD",
-    version=__version__,
-    author="Even Wong",
-    author_email="evenwong@stu.cdut.edu.cn",
-    url="https://github.com/###",
-    description="A project about mpcd&md.",
-    long_description="",
-    extras_require={},
+    name = "PyMPCD_MD",
+    version = __version__,
+    author = "Even Wong",
+    author_email = "evenwong@stu.cdut.edu.cn",
+    url = "https://github.com/Gddr100x/PyMPCD-MD",
+    description = "A python-based simulation package about mpcd and md.",
+    long_description = "",
+    extras_require = {},
 ##    ext_modules=ext_modules,
     packages = find_packages(),
-    zip_safe=False,
-    python_requires=">=3.8",
-    install_requires=[
+    zip_safe = False,
+    python_requires = ">=3.0",
+    install_requires = [
         'matplotlib',
         'numpy',
         'scipy',
