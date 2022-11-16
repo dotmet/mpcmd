@@ -128,13 +128,13 @@ class Solute(object):
         
         self.md_sys = None
         
-    def create_solute(self, position=None, velocity=None, N=0, mass=10.0):
+    def create_solute(self, mpcd_sys=None, position=None, velocity=None, N=0, mass=10.0):
         self.position = position
         self.velocity = velocity
         self.N = N
         self.mass = mass
                 
-    def perform_md_simulation(self, steps, mute=False):
+    def run_md_simulation(self, steps, mute=False):
 
         self.md_sys.reset_velocity(self.velocity)
         self.md_sys.run(steps, mute)

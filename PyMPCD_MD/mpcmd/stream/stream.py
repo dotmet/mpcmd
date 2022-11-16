@@ -30,7 +30,7 @@ class Stream(object):
             
         if mpcd_sys.solute:
             mute = mpcd_sys.mute_md
-            mpcd_sys.solute.run(self.period, mute)
+            mpcd_sys.solute.run_md_simulation(self.period, mute)
 
         e = time.time()
         
