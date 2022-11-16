@@ -12,7 +12,7 @@ __version__ = "0.0.1"
 #   say from a submodule.
 
 #ext_modules = [
-#    Pybind11Extension("cpp",
+#    Pybind11Extension("cpp_ext",
 #        [os.getcwd()+"/*.cpp"],
 #        # Example: passing in the version to the compiled code
 #        define_macros = [('VERSION_INFO', __version__)],
