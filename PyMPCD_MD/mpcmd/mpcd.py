@@ -41,6 +41,8 @@ class MPCD(object):
 
         self.mute = True
         self.mute_md = False
+        
+        self.test_mode = False
     
     def set_box(self, box=[100, 100, 100]):
 

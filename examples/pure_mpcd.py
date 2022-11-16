@@ -16,3 +16,7 @@ m.collide(kbt=1.0, alpha=130, period=20)
 
 # Run
 m.run(1e4, mute=1e3)
+
+# Add external force field
+m.add_force(a=0.5, direction=[0,0,1])
+m.run(1e4, mute=1e3)

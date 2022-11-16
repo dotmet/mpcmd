@@ -128,17 +128,17 @@ class Solute(object):
         
         self.md_sys = None
         
-    def create_solute(self, mpcd_sys=None, position=None, velocity=None, N=0, mass=10.0):
+    def create_solute(self, position=None, velocity=None, N=0, mass=10.0):
         self.position = position
         self.velocity = velocity
         self.N = N
         self.mass = mass
-        self.ids = np.array(list(range(mpcd_sys.fluid.N, mpcd_sys.fluid.N+N)), dtype=int)
-        
-    def run(self, run, mute=False):
+                
+    def perform_md_simulation(self, steps, mute=False):
 
         self.md_sys.reset_velocity(self.velocity)
-        self.md_sys.run(run, mute)
+        self.md_sys.run(steps, mute)
+        
         self.position[:] = self.md_sys.position
         self.velocity[:] = self.md_sys.velocity
         

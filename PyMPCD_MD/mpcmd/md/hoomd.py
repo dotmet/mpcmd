@@ -10,8 +10,12 @@ class Hoomd(object):
     
     def __init__(self):
         
+        print('\n###\nYou are using HOOMD-blue packages to perform MD simulation !\n###\n')
+        
         self.hoomd = hoomd
         self.sim = hoomd.context.initialize("MPCD & MD")
+        hoomd.option.set_notice_level(0)
+        
         self.integrator = None
         self.system = None
         

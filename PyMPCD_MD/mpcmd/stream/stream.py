@@ -29,10 +29,10 @@ class Stream(object):
             shear = Shear(mpcd_sys)
             
         if mpcd_sys.solute:
-            quiet = mpcd_sys.mute_md
-            mpcd_sys.solute.run(self.period, quiet)
+            mute = mpcd_sys.mute_md
+            mpcd_sys.solute.run(self.period, mute)
 
         e = time.time()
         
-        if not mpcd_sys.mute:
+        if mpcd_sys.test_mode and not mpcd_sys.mute:
             print('Perform stream costs: ', e-s, 's')
