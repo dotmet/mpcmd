@@ -229,9 +229,9 @@ class Cylinder(Geometry):
             
         self.grids += vec_p
 
-        # for gid in range(self.grids.shape[0]):
-        #     grid = self.grids[gid]
-        #     self.grids[gid][-1] = self.grid_in_boundary(grid)
+        for gid in range(self.grids.shape[0]):
+            grid = self.grids[gid]
+            self.grids[gid][-1] = self.grid_in_boundary(grid)
 
         return self.grids
 

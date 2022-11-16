@@ -69,22 +69,18 @@ class Collide(object):
             print('Perform collide with numba: ', e-s, 's')
 
     @staticmethod
-    @jit(cache=True)
+    @njit(cache=True)
     def np_collide(grids, posi, velo, masses, alpha, avg_ps, kbt):
 
         ngrids = grids.shape[0]
         tnps = posi.shape[0] # Total particles
         masses = masses.reshape(masses.shape[0],1)
 
-        for gid in range(ngrids):
+        for gid in prange(ngrids):
 
             grid = grids[gid]
 
             xlo,xhi,ylo,yhi,zlo,zhi = grid[0:6]
-            have_bound = grid[6]
-
-            if have_bound == 2.0:
-                continue
 
             pids = np.where((posi[:,0]>=xlo) & (posi[:,0]<xhi) & (posi[:,1]>=ylo) & (posi[:,1]<yhi) & (posi[:,2]>=zlo) & (posi[:,2]<zhi))[0]
             
@@ -92,14 +88,25 @@ class Collide(object):
             tnps = tnps - gnps
             
             if gnps > 0:
-
+            
                 mass = masses[pids]
                 vs = velo[pids]
-
-                if have_bound:
-                    vcm = np.sum(vs*mass, axis=0)/np.sum(mass)
-                else:
-                    vcm = np.sum(vs*mass, axis=0)/np.sum(mass)
+                
+                # Add ghost particles
+                Nsp = 0
+                Psp = np.zeros(3) 
+                if grid[6] == 1.0:
+                    Nall_ = np.random.poisson(lam=avg_ps)
+                    if Nall_> gnps:
+                        Nsp = Nall_ - gnps
+                        Pvar = Nsp*kbt
+                        Psps = np.random.randn(Nsp, 3)
+                        Psp = np.power(Pvar, 1/3) * np.sum(Psps, axis=0)/Nsp
+                # End
+                    
+                pcm = np.sum(vs*mass, axis=0) + Psp
+                m_all = np.sum(mass) + Nsp
+                vcm = pcm / m_all
 
                 phi = 2*np.pi*np.random.rand()
                 theta = 2*np.random.rand() - 1.0
