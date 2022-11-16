@@ -29,4 +29,4 @@ m.logger(period=1000, objects=['fluid'], fnames=['test_fluid.gsd'])
 m.run(1e4, mute=1e3)
 ```
 
-# Enjoy it ! 😊
+# Enjoy it ! 
