@@ -4,7 +4,7 @@ A fully extensible hydrodynamic simulation package
 # Install package
 ```Bash
 cd PyMPCD_MD
-pip install .
+python setup.py install
 ```
 
 # Example
