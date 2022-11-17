@@ -20,10 +20,8 @@ class Collide(object):
         if shift:
             geometry.shift_grid()
         grids = geometry.get_grid()
-        ngrids = geometry.ngrids
 
         posi, velo = mpcd_sys.get_position(), mpcd_sys.get_velocity()
-        nps = len(posi)
         
         fluid, solute = mpcd_sys.fluid, mpcd_sys.solute
         
