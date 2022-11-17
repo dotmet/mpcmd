@@ -30,7 +30,6 @@ class Cylinder(Geometry):
         self.a = 1.0
 
         self.grids = None
-        self.ngrids = 0
 
         self.bounding_box = [100, 100, 100]
         self.inscribed_box = [0, 0, 0]
@@ -38,10 +37,10 @@ class Cylinder(Geometry):
         self.shift_vec = arr([0., 0., 0.])
         self.shifted = False
 
-        self._cal_bounding_box()
+        self.cal_bounding_box()
         self.construct_grid()
     
-    def _cal_bounding_box(self):
+    def cal_bounding_box(self):
         
         ginfo = self.geometry_info
 
@@ -138,35 +137,6 @@ class Cylinder(Geometry):
                 res[pid] = 0.0
         
         return res
-        
-    def get_grid(self):
-        if self.grids is None:
-            self.construct_grid(self, a=1)
-        return self.grids
-
-    def shift_grid(self):
-
-        vec = np.random.random(3)*0.5 + 0.5
-        total_vec = vec + self.shift_vec
-        if total_vec[0]>=1 or total_vec[0]<=-1:
-            vec[0] = -vec[0]
-        if total_vec[1]>=1 or total_vec[1]<=-1:
-            vec[1] = -vec[1]
-        if total_vec[2]>=1 or total_vec[2]<=-1:
-            vec[2] = -vec[2]
-        
-        self.shift_vec += vec
-
-        vec_p = np.array([vec[0], vec[0], vec[1], vec[1], vec[2], vec[2], 0])
-
-        if self.grids is None:
-            self.construct_grid()
-            
-        self.grids += vec_p
-
-        self.grids = self.mark_grid(self.grids)
-
-        return self.grids
 
     def construct_grid(self, a=1, replace=True):
 
@@ -195,7 +165,6 @@ class Cylinder(Geometry):
         if replace:
             self.a = a
             self.grids = grids
-            self.ngrids = len(grids)
         else:
             return grids
     
@@ -239,7 +208,36 @@ class Cylinder(Geometry):
             elif max_r > r and min_r < r:
                 grid[-1] = 1
         
-        return grids  
+        return grids 
+    
+    def get_grid(self):
+        if self.grids is None:
+            self.construct_grid(self, a=1)
+        return self.grids
+
+    def shift_grid(self):
+
+        vec = np.random.random(3)*0.5 + 0.5
+        total_vec = vec + self.shift_vec
+        if total_vec[0]>=1 or total_vec[0]<=-1:
+            vec[0] = -vec[0]
+        if total_vec[1]>=1 or total_vec[1]<=-1:
+            vec[1] = -vec[1]
+        if total_vec[2]>=1 or total_vec[2]<=-1:
+            vec[2] = -vec[2]
+        
+        self.shift_vec += vec
+
+        vec_p = np.array([vec[0], vec[0], vec[1], vec[1], vec[2], vec[2], 0])
+
+        if self.grids is None:
+            self.construct_grid()
+            
+        self.grids += vec_p
+
+        self.grids = self.mark_grid(self.grids)
+
+        return self.grids
 
     def boundary_parse(self, posi, old_posi, velo, rule='reverse'):
 
@@ -305,7 +303,7 @@ class Cylinder(Geometry):
         
         return posi, velo
 
-    def restore_snapshot(self, position, replace=True):
+    def restore_configuration(self, position, replace=True):
         
         ginfo = self.geometry_info
         r, lo, hi = ginfo['radius'], ginfo['lo'], ginfo['hi']
