@@ -4,11 +4,11 @@ from mpcmd.geometry import Cylinder
 
 # Set fluid geometry
 cyl = Cylinder(dim='z', radius=10.0, lo=0, hi=10)
-cyl.construct_grid(a=1)
+cyl.construct_grid(a=1.0)
 
 # Setup System
 m = MPCD()
-m.set_box(box=[100, 100, 100])
+m.set_box(box=[100., 100., 100.])
 m.set_geometry(cyl)
 m.add_fluid(density=10)
 m.stream(dt=0.005, period=20)
