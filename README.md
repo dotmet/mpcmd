@@ -13,11 +13,14 @@ python setup.py install
 from mpcmd import MPCD
 from mpcmd.geometry import Cylinder
 
-# Setup System
+# Set fluid geometry
+cyl = Cylinder(dim='z', radius=10.0, lo=0, hi=10)
+cyl.construct_grid(a=1)
+
+# Setup MPCD system
 m = MPCD()
 m.set_box(box=[100, 100, 100])
-m.geometry = Cylinder(dim='z', radius=10.0, lo=0, hi=10)
-m.geometry.construct_grid(a=1)
+m.set_geometry(cyl)
 m.add_fluid(density=10)
 m.stream(dt=0.005, period=20)
 m.collide(kbt=1.0, alpha=130, period=20)
