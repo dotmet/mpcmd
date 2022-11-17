@@ -1,7 +1,3 @@
-from memory_profiler import profile
-
-from .thermo import MBS
-
 import numpy as np
 
 from scipy.special import gamma
@@ -18,7 +14,6 @@ class Collide(object):
         self.thermo = thermo
         self.fluid_density = 0
 
-    # @profile
     def collide(self, mpcd_sys, shift=True):
 
         geometry = mpcd_sys.geometry
