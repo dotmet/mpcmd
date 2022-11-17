@@ -24,6 +24,7 @@ class Cylinder(Geometry):
                               'radius':radius, 'lo':_lo, 'hi':_hi}
         self.info = self.geometry_info
         
+        
         self.dimension = 3
         self.volume = 0
         self.a = 1.0
@@ -37,10 +38,10 @@ class Cylinder(Geometry):
         self.shift_vec = arr([0., 0., 0.])
         self.shifted = False
 
-        self._cal_bounding()
+        self._cal_bounding_box()
         self.construct_grid()
     
-    def _cal_bounding(self):
+    def _cal_bounding_box(self):
         
         ginfo = self.geometry_info
 
@@ -95,49 +96,152 @@ class Cylinder(Geometry):
         
         return True
 
-    def particle_in_geometry(self, particle, geometry=None, detail_info=False):
-        
-        if geometry is None or geometry.geometry_name.lower()!='cylinder':
-            geometry = self
-        ginfo = geometry.geometry_info
-
+    def particle_in_geometry(self, particles):
+        ginfo = self.geometry_info
         r, lo, hi = ginfo['radius'], ginfo['lo'], ginfo['hi']
-        x, y, z = particle
+        dim = ['x', 'y', 'z'].index(ginfo['dim'])
+        
+        if particles.ndim == 1:
+            particles = np.array([particles])
 
-        bound = {'dim':None, 'nondim':None}
-
-        if ginfo['dim'] == 'x':
-            if x<=lo or x>hi:
-                bound['dim'] = 'x'
-            if np.linalg.norm([x,y])>=r:
-                bound['nondim'] = 'yoz'
-        elif ginfo['dim'] == 'y':
-            if y<=lo or y>hi:
-                bound['dim'] = 'y'
-            if np.linalg.norm([x, z])>=r:
-                bound['nondim'] = 'xoz'
-        elif ginfo['dim'] == 'z':
-            if z<=lo or z>hi:
-                bound['dim'] = 'z'
-            if np.linalg.norm([x,y])>=r:
-                bound['nondim'] = 'xoy'
-
-        res = True
-        if bound['dim'] is not None or bound['nondim'] is not None:
-            res = False
-
-        if detail_info:
-            return bound
-        else:
-            return res
-
-    def particles_in_geometry(self, particles, geometry=None):
-        res = []
-        for p in particles:
-            res.append(self.particle_in_geometry(p, geometry))
+        results = self._particle_in_geometry(dim=dim, r=r, lo=lo, hi=hi, position=particles)
+        
+        if particles.ndim == 1:
+            results = results[0]
+        
+        return results
+    
+    @staticmethod
+    @njit(cache=True)
+    def _particle_in_geometry(dim, r, lo, hi, position):
+        
+        nps = position.shape[0]
+        
+        res = np.ones(nps)
+        
+        for pid in prange(nps):
+        
+            x, y, z = position[pid]
+            
+            dist = y*y + z*z
+            r2 = r*r
+            
+            if dim == 1:
+                dist = x*x + z*z
+                x = y
+            elif dim == 2:
+                dist = x*x + y*y
+                x = z
+            
+            if x<lo or x>hi or dist>=r2:
+                
+                res[pid] = 0.0
+        
         return res
+        
+    def get_grid(self):
+        if self.grids is None:
+            self.construct_grid(self, a=1)
+        return self.grids
 
-    def perform_boundary(self, posi, old_posi, velo, rule='reverse'):
+    def shift_grid(self):
+
+        vec = np.random.random(3)*0.5 + 0.5
+        total_vec = vec + self.shift_vec
+        if total_vec[0]>=1 or total_vec[0]<=-1:
+            vec[0] = -vec[0]
+        if total_vec[1]>=1 or total_vec[1]<=-1:
+            vec[1] = -vec[1]
+        if total_vec[2]>=1 or total_vec[2]<=-1:
+            vec[2] = -vec[2]
+        
+        self.shift_vec += vec
+
+        vec_p = np.array([vec[0], vec[0], vec[1], vec[1], vec[2], vec[2], 0])
+
+        if self.grids is None:
+            self.construct_grid()
+            
+        self.grids += vec_p
+
+        self.grids = self.mark_grid(self.grids)
+
+        return self.grids
+
+    def construct_grid(self, a=1, replace=True):
+
+        xlo, xhi, ylo, yhi, zlo, zhi = np.array(self.bounding_box).flatten()
+
+        nx, ny, nz = int((xhi-xlo)/a) + 2, int((yhi-ylo)/a)+2, int((zhi-zlo)/a)+2
+
+        xls = np.linspace(xlo-a, xhi+a, nx+1)
+        yls = np.linspace(ylo-a, yhi+a, ny+1)
+        zls = np.linspace(zlo-a, zhi+a, nz+1)
+
+        grids = []
+        for i in range(nx):
+            for j in range(ny):
+                for k in range(nz):
+                    grid = [xls[i], xls[i+1], yls[j], yls[j+1], zls[k], zls[k+1], 0]
+                    grids.append(grid)
+        
+        grids = np.array(grids)
+        
+        _grids = self.mark_grid(grids)
+        
+        if np.sum(_grids - grids)!=0:
+            print(_grids)
+
+        if replace:
+            self.a = a
+            self.grids = grids
+            self.ngrids = len(grids)
+        else:
+            return grids
+    
+    def mark_grid(self, grids):
+    
+        ginfo = self.geometry_info
+        r, lo, hi = ginfo['radius'], ginfo['lo'], ginfo['hi']
+        dim = ['x', 'y', 'z'].index(ginfo['dim'])
+        _grids = self._mark_grid(dim=dim, r=r, lo=lo, hi=hi, grids=grids)
+        
+        return _grids
+        
+    @staticmethod
+    @njit(cache=True)
+    def _mark_grid(dim, r, lo, hi, grids):
+        
+        ngrids = grids.shape[0]
+        
+        for gid in prange(ngrids):
+            
+            grid = grids[gid]
+            xl, xh, yl, yh, zl, zh = grid[:6]
+            
+            l1, h1, l2, h2 = yl, yh, zl, zh
+            if dim == 1:
+                l1, h1 = xl, xh
+                xl, xh = yl, yh
+            elif dim == 2:
+                l2, h2 = xl, xh
+                xl, xh = zl, zh
+            
+            all_rs = np.zeros(4)
+            all_rs[0], all_rs[1] = l1*l1 + l2*l2, l1*l1 + h2*h2
+            all_rs[2], all_rs[3] = h1*h1 + l2*l2, h1*h1 + h2*h2
+            
+            max_r, min_r = np.max(all_rs), np.min(all_rs)
+            
+            r = r*r
+            if min_r >= r or xl<=lo or xh>=hi:
+                grid[-1] = 2
+            elif max_r > r and min_r < r:
+                grid[-1] = 1
+        
+        return grids  
+
+    def boundary_parse(self, posi, old_posi, velo, rule='reverse'):
 
         ginfo = self.geometry_info
         r, lo, hi = ginfo['radius'], ginfo['lo'], ginfo['hi']
@@ -145,9 +249,6 @@ class Cylinder(Geometry):
 
         if rule.lower()=='reverse':
             return self.reverse(posi, old_posi, velo, dim, r, lo, hi)
-
-    def move_back(self):
-        pass
 
     @staticmethod
     @njit(cache=True)
@@ -203,103 +304,6 @@ class Cylinder(Geometry):
             velo[pid] = pv
         
         return posi, velo
-
-    def get_grid(self):
-        if self.grids is None:
-            self.construct_grid(self, a=1)
-        return self.grids
-
-    def shift_grid(self):
-
-        vec = np.random.random(3)*0.5 + 0.5
-        total_vec = vec + self.shift_vec
-        if total_vec[0]>=1 or total_vec[0]<=-1:
-            vec[0] = -vec[0]
-        if total_vec[1]>=1 or total_vec[1]<=-1:
-            vec[1] = -vec[1]
-        if total_vec[2]>=1 or total_vec[2]<=-1:
-            vec[2] = -vec[2]
-        
-        self.shift_vec += vec
-
-        vec_p = np.array([vec[0], vec[0], vec[1], vec[1], vec[2], vec[2], 0])
-
-        if self.grids is None:
-            self.construct_grid()
-            
-        self.grids += vec_p
-
-        for gid in range(self.grids.shape[0]):
-            grid = self.grids[gid]
-            self.grids[gid][-1] = self.grid_in_boundary(grid)
-
-        return self.grids
-
-    def construct_grid(self, a=1, replace=True):
-
-        xlo, xhi, ylo, yhi, zlo, zhi = np.array(self.bounding_box).flatten()
-
-        nx, ny, nz = int((xhi-xlo)/a) + 2, int((yhi-ylo)/a)+2, int((zhi-zlo)/a)+2
-
-        xls = np.linspace(xlo-a, xhi+a, nx+1)
-        yls = np.linspace(ylo-a, yhi+a, ny+1)
-        zls = np.linspace(zlo-a, zhi+a, nz+1)
-
-        grids = []
-        for i in range(nx):
-            for j in range(ny):
-                for k in range(nz):
-                    grid = [xls[i], xls[i+1], yls[j], yls[j+1], zls[k], zls[k+1], 0]
-                    grid[-1] = self.grid_in_boundary(grid)
-                    grids.append(grid)
-        
-        grids = np.array(grids)
-
-        if replace:
-            self.a = a
-            self.grids = grids
-            self.ngrids = len(grids)
-        else:
-            return grids
-
-    def grid_in_boundary(self, grid):
-
-        ginfo = self.geometry_info
-        r, lo, hi = ginfo['radius'], ginfo['lo'], ginfo['hi']
-
-        xlo, xhi, ylo, yhi, zlo, zhi = grid[:6]
-        dim = ginfo['dim']
-
-        if dim == 'x':
-            mat = [[ylo, zlo],[ylo, zhi], 
-                    [yhi, zlo], [yhi, zhi]]
-            dists = np.linalg.norm(mat, axis=1)
-            if np.min(dists)>=r or xlo<=lo or xhi>=hi:
-                return 2
-            elif np.max(dists)>r and np.min(dists)<r:
-                return 1
-            else:
-                return 0
-        elif dim == 'y':
-            mat = [[xlo, zlo], [xlo, zhi],
-                    [xhi, zlo], [xhi, zhi]]
-            dists = np.linalg.norm(mat, axis=1)
-            if np.min(dists)>=r or ylo<=lo or yhi>=hi:
-                return 2
-            elif np.max(dists)>r and np.min(dists)<r:
-                return 1
-            else:
-                return 0
-        elif dim == 'z':
-            mat = [[xlo, ylo], [xlo, yhi],
-                    [xhi, ylo], [xhi, yhi]]
-            dists = np.linalg.norm(mat, axis=1)
-            if np.min(dists)>=r or zlo<=lo or zhi>=hi:
-                return 2
-            if np.max(dists)>r and np.min(dists)<r:
-                return 1
-            else:
-                return 0
 
     def restore_snapshot(self, position, replace=True):
         

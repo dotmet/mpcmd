@@ -342,16 +342,17 @@ class Visualize(object):
         elif view == 'yoz':
             idxs = [1, 2]
             
-        ax = sns.kdeplot(all_coords[:,idxs[0]], all_coords[:,idxs[1]], 
-                    fill=True, 
-                    cmap=plt.get_cmap('Oranges'), 
-                    cbar=True,
-                    cbar_kws={'format':'%.3f'},
-                    gridsize=gridsize,
-                    # bw_method = bw,
-                    levels=levels,
-                    ax = ax,
-                )
+        ax = sns.kdeplot(x = all_coords[:,idxs[0]], 
+                         y = all_coords[:,idxs[1]], 
+                        fill=True, 
+                        cmap=plt.get_cmap('Oranges'), 
+                        cbar=True,
+                        cbar_kws={'format':'%.3f'},
+                        gridsize=gridsize,
+                        # bw_method = bw,
+                        levels=levels,
+                        ax = ax,
+                        )
         return ax
     
     @staticmethod

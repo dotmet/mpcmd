@@ -48,7 +48,7 @@ class Poiseuille(object):
         
         # s = time.time()
 
-        new_posi, new_velo = geometry.perform_boundary(new_posi, prev_posi, velo)
+        new_posi, new_velo = geometry.boundary_parse(new_posi, prev_posi, velo)
         new_velo += a*dt
         # e = time.time()
         

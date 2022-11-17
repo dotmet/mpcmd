@@ -4,11 +4,14 @@ from mpcmd.geometry import Cylinder
 
 import numpy as np
 
+# Set fluid geometry
+cyl = Cylinder(dim='z', radius=10.0, lo=0, hi=10)
+cyl.construct_grid(a=1)
+
 # Setup MPCD system
 m = MPCD()
 m.set_box(box=[100, 100, 100])
-m.geometry = Cylinder(dim='z', radius=10.0, lo=0, hi=15)
-m.geometry.construct_grid(a=1)
+m.set_geometry(cyl)
 m.add_fluid(density=5)
 m.stream() # dt=0.005 period=20
 m.collide() # KbT=1.0 alpha=130
@@ -45,5 +48,5 @@ m.solute.md_sys = hmd
 m.run(1e4, mute=1e3)
 
 # Start
-m.add_force(a=0.5, direction=[0,0,1])
+m.add_force(a=0.1, direction=[0,0,1])
 m.run(1e4, mute=1e3)

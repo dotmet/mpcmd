@@ -64,6 +64,10 @@ class MPCD(object):
                                     [-box[2]/2, box[2]/2]]
                     except:
                         raise ValueError(err_msg)
+    
+    def set_geometry(self, geometry):
+        
+        self.geometry = geometry
         
     def add_fluid(self, position=None, velocity=None, N=0, density=5, mass=1.0, kbt=1.0):
 
