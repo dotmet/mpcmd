@@ -30,6 +30,10 @@ m.logger(period=1000, objects=['fluid'], fnames=['test_fluid.gsd'])
 
 # Run
 m.run(1e4, mute=1e3)
+
+# Add force field
+m.add_force(a=0.1, direction=[0,0,1])
+m.run(1e4, mute=1e3)
 ```
 
 # Enjoy it ! 
