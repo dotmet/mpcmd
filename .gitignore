@@ -131,7 +131,7 @@ dmypy.json
 .pyre/
 
 # ignore files for Hoomd and Lammps
-.lammpstrj
-.lammps
-.gsd
+*.lammpstrj
+*.lammps
+*.gsd
 *.log
