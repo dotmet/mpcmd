@@ -129,3 +129,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# ignore files for Hoomd and Lammps
+.lammpstrj
+.lammps
+.gsd
+*.log
