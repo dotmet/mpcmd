@@ -272,7 +272,7 @@ class Visualize(object):
             self.contain_solute = contain_solute
             self.sort_by_grids(plane, loc, grid_length, contain_solute)
 
-        print(f'Show velocity field in {plane} plane ...')
+        
         if plane == 'xoy':
             i1, i2, idx3 = 0, 1, 2
         elif plane == 'yoz':
@@ -285,6 +285,7 @@ class Visualize(object):
         valist, vblist = vcm_grids[:,i1], vcm_grids[:,i2]
         
         if show:
+            print(f'Show velocity field in {plane} plane ...')
             if transpose:
                 plt.quiver(blist, alist, vblist, valist)
             else:
@@ -309,17 +310,19 @@ class Visualize(object):
         plt.hist(vs, bins)
         plt.show()
 
-    def velocity_profile(self, plane='xoy', loc_plane=None, loc_cross=0.0, grid_length=1, view=0):
+    def velocity_profile(self, plane='xoz', loc_plane=None, loc_cross=0.0, grid_length=1, dim=1):
         alist, blist, valist, vblist=self.velocity_field(plane, loc_plane, grid_length, show=False)
         als, nas = np.unique(alist, return_counts=True)
         bls, nbs = np.unique(blist, return_counts=True)
-        vs = []
-        if view==0:
-            nas = nas[0]
-            for i in range(len(als)):
-                vs.append(i*nas)
-        else:
-            plt.plot(blist, vblist)
+        if dim==0:
+            locs = bls
+            vs = valist.reshape(nas[0], nbs[0])
+            vs = np.mean(vs, axis=1)
+        elif dim==1:
+            locs = als
+            vs = vblist.reshape(nbs[0], nas[0])
+            vs = np.mean(vs, axis=1)
+        plt.plot(locs, vs)
         plt.show()
 
     def density(self, plane='xoy', loc=None, grid_length=1, contain_solute=False):
