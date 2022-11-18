@@ -310,8 +310,8 @@ class Visualize(object):
         plt.hist(vs, bins)
         plt.show()
 
-    def velocity_profile(self, plane='xoz', loc_plane=None, loc_cross=0.0, grid_length=1, dim=1):
-        alist, blist, valist, vblist=self.velocity_field(plane, loc_plane, grid_length, show=False)
+    def velocity_profile(self, plane='xoz', plane_loc=None, loc_cross=0.0, grid_length=1, dim=1):
+        alist, blist, valist, vblist=self.velocity_field(plane, plane_loc, grid_length, show=False)
         als, nas = np.unique(alist, return_counts=True)
         bls, nbs = np.unique(blist, return_counts=True)
         if dim==0:

@@ -181,6 +181,8 @@ class MPCD(object):
 
         start = self.step
         end = start + nruns
+        
+        print('Start running ...')
             
         for i in range(self.step, self.step+int(nruns)+1, self.period):
         
