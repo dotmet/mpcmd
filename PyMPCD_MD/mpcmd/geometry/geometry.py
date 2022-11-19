@@ -5,7 +5,7 @@ class Geometry(object):
         
         self.geometry_name = 'geometry'
         self.geometry_info = []
-        self.boundary_rules = ['pp', 'ff']
+        self.boundary_rules = []
         
         self.dimension = 3
         self.volume = 0
@@ -16,7 +16,7 @@ class Geometry(object):
         self.bounding_box = None
         self.inscribed_box = None
     
-    def cal_bounding_box():
+    def cal_bounding_box(self):
         pass
     
     def geometry_in_box(self, box):
@@ -37,10 +37,7 @@ class Geometry(object):
     def shift_grid(self):
         pass
         
-    def boundary_parse(self):
-        pass
-
-    def restore_configuration(self, position=None):
+    def apply_boundary_condition(self):
         pass
         
     

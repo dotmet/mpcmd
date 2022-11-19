@@ -44,18 +44,11 @@ class Poiseuille(object):
         f = force.get_vector(t)
         a = f/m
         
-        # new_posi = posi + velo*dt + 0.5*a*dt*dt
-        
-        # # s = time.time()
-
-        # new_posi, new_velo = geometry.boundary_parse(new_posi, prev_posi, velo)
-        # new_velo += a*dt
-        # # e = time.time()
         v_ht = velo + a*dt/2
         new_posi = posi + v_ht*dt
         new_velo = v_ht + a*dt/2
         
-        new_posi, new_velo = geometry.boundary_parse(new_posi, prev_posi, new_velo)
+        new_posi, new_velo = geometry.apply_boundary_condition(new_posi, prev_posi, new_velo)
         
         # if not mpcd_sys.mute:
         #     print('Perform boundary parse costs: ', e-s, 's')

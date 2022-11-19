@@ -239,7 +239,7 @@ class Cylinder(Geometry):
 
         return self.grids
 
-    def boundary_parse(self, posi, old_posi, velo, rule='reverse'):
+    def apply_boundary_condition(self, posi, old_posi, velo, rule='reverse'):
 
         ginfo = self.geometry_info
         r, lo, hi = ginfo['radius'], ginfo['lo'], ginfo['hi']
