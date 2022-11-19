@@ -8,14 +8,15 @@ from numba import njit, prange, jit
 
 class Collide(object):
 
-    def __init__(self, kbt=1.0, alpha=120, thermo='MBS'):
+    def __init__(self, kbt=1.0, alpha=130, thermo='MBS'):
         self.kbt = kbt
         self.alpha = alpha
         self.thermo = thermo
         self.fluid_density = 0
 
     def collide(self, mpcd_sys, shift=True):
-
+        
+        self.alpha = mpcd_sys.alpha
         geometry = mpcd_sys.geometry
         if shift:
             geometry.shift_grid()
@@ -45,8 +46,8 @@ class Collide(object):
             self.fluid_density = 1
 
         s = time.time()
-
-        res_velo = self.np_collide(grids, posi, velo, mass, self.alpha*np.pi/180, self.fluid_density, self.kbt)
+        
+        res_velo = self.np_collide(grids, posi, velo, mass, self.alpha, self.fluid_density, self.kbt)
 
         if fluid and solute:
             mpcd_sys.fluid.velocity[:] = res_velo[fluid.ids]
@@ -64,7 +65,7 @@ class Collide(object):
     @staticmethod
     @njit(cache=True)
     def np_collide(grids, posi, velo, masses, alpha, avg_ps, kbt):
-
+        
         ngrids = grids.shape[0]
         tnps = posi.shape[0] # Total particles
         masses = masses.reshape(masses.shape[0],1)
@@ -100,7 +101,7 @@ class Collide(object):
                         Nsp = Nall_ - gnps
                         Pvar = Nsp*kbt
                         Psps = np.random.randn(Nsp, 3)
-                        Psp = np.power(Pvar, 1/3) * np.sum(Psps, axis=0)/Nsp
+                        Psp = np.power(Pvar, 1/3) * np.sum(Psps, axis=0)
                 # End
                     
                 pcm = np.sum(vs*mass, axis=0) + Psp
@@ -126,17 +127,23 @@ class Collide(object):
                 mat[2,1] = ny*nz*(1-ca) + nx*sa
                 mat[2,2] = ca + nz*nz*(1-ca)
                 
-                vres = vcm + np.dot(vs-vcm, mat)
-                
-                Ek = np.sum(vres*vres*mass*0.5)
-
+                # MBS Thermostat
+                d_vs = vs - vcm
+                d_Ek = np.sum(d_vs*d_vs*mass*0.5)
                 _k = 3*(gnps-1)/2
-                if _k == 0:
-                    _k = 0.1
+                if _k==0:
+                    _k = 0.01
                 _Ek = np.random.gamma(_k, kbt)
-                factor = np.sqrt(_Ek/Ek)
                 
-                velo[pids] = vres * factor
+                if d_Ek==0 or _Ek==0:
+                    factor = 1
+                else:
+                    factor = np.sqrt(_Ek/d_Ek)
+                    
+                vres = vcm + factor*np.dot(d_vs, mat)
+                
+                # Complete collision step
+                velo[pids] = vres
 
             if tnps <= 0:
                 break

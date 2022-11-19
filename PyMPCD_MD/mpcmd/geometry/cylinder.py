@@ -227,15 +227,15 @@ class Cylinder(Geometry):
             vec[2] = -vec[2]
         
         self.shift_vec += vec
-
+        
         vec_p = np.array([vec[0], vec[0], vec[1], vec[1], vec[2], vec[2], 0])
 
         if self.grids is None:
             self.construct_grid()
-            
-        self.grids += vec_p
+        else:
+            self.grids += vec_p
 
-        self.grids = self.mark_grid(self.grids)
+        self.grids = self.mark_grid(self.grids)        
 
         return self.grids
 

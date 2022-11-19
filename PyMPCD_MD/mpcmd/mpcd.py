@@ -145,7 +145,10 @@ class MPCD(object):
             self.Stream.fluid_type = fluid_type
     
     def collide(self, kbt=1.0, alpha=130, period=20, thermo='MBS'):
-
+        
+        if np.abs(alpha)>2*np.pi:
+            alpha = alpha*np.pi/180
+        
         self.period = period
         self.kbt, self.alpha = kbt, alpha
         if self.Collide is None:
@@ -181,9 +184,10 @@ class MPCD(object):
 
         start = self.step
         end = start + nruns
-
+        
         print('Start running ...')
-            
+        
+        Tps = []
         for i in range(self.step, self.step+int(nruns)+1, self.period):
         
             if isinstance(mute, int):
@@ -211,20 +215,24 @@ class MPCD(object):
             self.Stream.stream(self)
             
             t2 = time.time()
-            tps = self.period/(t2-t1)
-            eta = (end - i)/tps
-            
-            eta_msg = f'ETA {np.round(eta, 1)} s'
-
-            if eta/(60*60*24) >= 1:
-                eta_msg = f'ETA {np.round(eta/(60*60*3600), 1)} day'
-            elif eta/3600 >= 1:
-                eta_msg = f'ETA {np.round(eta/3600, 1)} h'
-            elif eta/60 >= 1:
-                eta_msg = f'ETA {np.round(eta/60, 1)} min'
+            _tps = self.period/(t2-t1)
+            Tps.append(_tps)
             
             if not self.mute and i!=start:
+                
+                tps = np.mean(Tps)
+                eta = (end - i)/tps
+                eta_msg = f'ETA {np.round(eta, 1)} s'
+
+                if eta/(60*60*24) >= 1:
+                    eta_msg = f'ETA {np.round(eta/(60*60*3600), 1)} day'
+                elif eta/3600 >= 1:
+                    eta_msg = f'ETA {np.round(eta/3600, 1)} h'
+                elif eta/60 >= 1:
+                    eta_msg = f'ETA {np.round(eta/60, 1)} min'
                 print(f'STEP {i} | TPS {np.round(tps,1)} |', eta_msg)
+                
+                Tps = []
 
     def visualize(self):
         return Visualize(self)
