@@ -127,18 +127,7 @@ class Collide(object):
                 mat[2,1] = ny*nz*(1-ca) + nx*sa
                 mat[2,2] = ca + nz*nz*(1-ca)
                 
-                # vres = vcm + np.dot(vs-vcm, mat)
-                
-                # Ek = np.sum(vres*vres*mass*0.5)
-                
-                # _k = 3*(gnps-1)/2
-                # if _k == 0:
-                #     _k = 0.01
-                # _Ek = np.random.gamma(_k, kbt)
-                # factor = np.sqrt(_Ek/Ek)
-                
-                # velo[pids] = vres * factor
-                
+                # MBS Thermostat
                 d_vs = vs - vcm
                 d_Ek = np.sum(d_vs*d_vs*mass*0.5)
                 _k = 3*(gnps-1)/2
@@ -153,6 +142,7 @@ class Collide(object):
                     
                 vres = vcm + factor*np.dot(d_vs, mat)
                 
+                # Complete collision step
                 velo[pids] = vres
 
             if tnps <= 0:
