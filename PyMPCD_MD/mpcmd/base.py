@@ -36,43 +36,34 @@ class Fluid(object):
 
         print('Initializing fluid ...')
         
-        if (position is None) and N==0 and density==0:
-            msg = f'Fulid parameters are not set properly: \n Position is {None} and # of particles is {N} !'
-            raise ValueError(msg)
-        elif (position is None) and N!=0:
-            position = np.random.random((N, 3))
-            position = position - 0.5
-        elif (position is None) and N==0:
-            if geometry is None:
-                msg = f'You have chosen density to initialize fluid, then you must provide the geometry info!'
-                raise ValueError(msg)
-            else:
-                N = int(geometry.volume/(geometry.a**3) * density)
-
-                position = np.random.random((N, 3))
-                position = position - 0.5
-        elif position is not None:
-            position = arr(position, dtype=float)
-        
         box = np.array(geometry.inscribed_box).flatten()
-        xl, yl, zl = box[1]-box[0]-2, box[3]-box[2]-2, box[5]-box[4]-2
-        xc, yc, zc = box[1]+box[0], box[3]+box[2], box[5]+box[4]
-
-        position[:,0] = xl*position[:,0] + xc/2
-        position[:,1] = yl*position[:,1] + yc/2
-        position[:,2] = zl*position[:,2] + zc/2
+        low = [box[0], box[2], box[4]]
+        high = [box[1], box[3], box[5]]
+        
+        if (position is None):
+            if N==0 and density==0:
+                msg = f'Fulid parameters are not set properly: \n Position is {None} and # of particles is {N} !'
+                raise ValueError(msg)
+            elif N==0:
+                if geometry is None:
+                    msg = f'You have chosen density to initialize fluid, then you must provide the geometry info!'
+                    raise ValueError(msg)
+                else:
+                    N = int(geometry.volume/(geometry.a**3) * density)
+            position = np.random.uniform(low=low, high=high, size=(N, 3))   
+        else:
+            position = arr(position, dtype=float)
+            if position.ndim != 2:
+                msg = f'Positions of fluid particles are invalid !'
+                raise ValueError(msg)
+            if position.shape[1] != 3:
+                msg = f'Fulid parameters are not set properly: \n Position has {position.shape[1]} coordinates !'
+                raise ValueError(msg)
 
         for p in position:
             if not geometry.particle_in_geometry(p):
                 raise ValueError('Not all fluid particles are contained in geometry!')
 
-        if position.ndim != 2:
-            msg = f'Fulid parameters are not set properly: \n Position format is 1 dimension (should be 2)!'
-            raise ValueError(msg)
-        if position.shape[1] != 3:
-            msg = f'Fulid parameters are not set properly: \n Position has {position.shape[1]} coordinates !'
-            raise ValueError(msg)
-            
         self.N = position.shape[0]
         self.mass = mass
 
@@ -86,7 +77,6 @@ class Fluid(object):
             raise WarningMessage(f'Fluid density [{self.density}] is smaller than 1 !')
         
         if velocity is not None:
-        
             velocity = arr(velocity, dtype=float)
             if velocity.ndim != 2:
                 velocity = None
@@ -94,12 +84,8 @@ class Fluid(object):
                 velocity = None
                 
         if velocity is None:
-
             scales = np.sqrt(KbT/arr([mass]*N))
             mean = 2*scales*np.sqrt(2/np.pi)
-            # vels = [[maxwell.rvs(scale=scale), maxwell.rvs(scale=scale), maxwell.rvs(scale=scale)] for scale in scales]
-            # velocity = np.array(vels) - np.stack([mean, mean, mean], axis=1)
-
             velocity = maxwell.rvs(scale=np.sqrt(KbT/mass), size=(self.N, 3))
             velocity = velocity - np.stack([mean, mean, mean], axis=1)
             
