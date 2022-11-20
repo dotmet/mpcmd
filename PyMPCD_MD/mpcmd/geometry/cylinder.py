@@ -285,10 +285,10 @@ class Cylinder(Geometry):
                 pcross = op + ov*dt
                 pp = 2*pcross - cp
                 pv = -ov
-            
-                # __r2 = pp[idr1]*pp[idr1] + pp[idr2]*pp[idr2]
-                # if __r2>=r2:
-                #     pp = pp*0.9
+                
+                __r2 = pp[idr1]*pp[idr1] + pp[idr2]*pp[idr2]
+                if __r2>=r2:
+                    pp = pp*0.9
             
             _loc = pp[ida]
             if _loc >= hi:

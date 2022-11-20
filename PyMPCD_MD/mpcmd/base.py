@@ -157,7 +157,7 @@ class Logger(object):
                  items=['position', 'velocity'], object_seperate=True, 
                  fnames=[None], ftypes=['gsd'], start=0, overwrite=True):
         
-        self.period = period
+        self.period = int(period)
         self.objects = objects
         self.items = items
         self.object_seperate = object_seperate
@@ -221,9 +221,10 @@ class Analyzer(object):
     
     def __init__(self, period=1000):
         
-        self.period = period
+        self.period = int(period)
     
     def set_analyzer(self, period=1000):
+        period = int(period)
         pass
         
     def analyze(self, mpcd_sys):
