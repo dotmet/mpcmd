@@ -92,7 +92,7 @@ class Collide(object):
                 mass = masses[pids]
                 vs = velo[pids]
                 
-                # Add ghost particles
+                # # Add ghost particles
                 Nsp = 0
                 Psp = np.zeros(3) 
                 if grid[6] == 1.0:
