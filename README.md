@@ -35,5 +35,3 @@ m.run(1e4, mute=1e3)
 m.add_force(a=0.1, direction=[0,0,1])
 m.run(1e4, mute=1e3)
 ```
-
-# Enjoy it ! 
