@@ -106,27 +106,23 @@ class Solute(object):
         self.mass = 10.0
         self.ids = []
         
-        # self.bonds = []
-        # self.angles = []
-        # self.dihedrals = []
-        
-        # self.force = None
-        
         self.md_sys = None
         
-    def create_solute(self, mpcd_sys=None, position=None, velocity=None, N=0, mass=10.0):
-        self.position = position
-        self.velocity = velocity
-        self.N = N
-        self.mass = mass
+    def create_solute(self, md_sys):
+        
+        self.md_sys = md_sys
+        self.position = md_sys.take_position()
+        self.velocity = md_sys.take_velocity()
+        self.N = md_sys.N
+        self.mass = md_sys.mass
                 
     def run_md_simulation(self, steps, mute=False):
 
         self.md_sys.reset_velocity(self.velocity)
         self.md_sys.run(steps, mute)
         
-        self.position[:] = self.md_sys.position
-        self.velocity[:] = self.md_sys.velocity
+        self.position[:] = self.md_sys.take_position()
+        self.velocity[:] = self.md_sys.take_velocity()
         
         
 class Force(object):

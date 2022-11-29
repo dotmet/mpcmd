@@ -8,12 +8,14 @@ import copy
 class Cylinder(Geometry):
 
     def __init__(self, dim='x', c1=[0,0,0], c2=[1,0,0], radius=2.0, lo=0, hi=1):
+        
         '''
             dim = x or y or z = axis of cylinder
             c1,c2 = coords of cylinder axis in other 2 dimensions (distance units)
             radius = cylinder radius (distance units)
             lo,hi = bounds of cylinder in dim (distance units)
         '''
+        
         super().__init__()
 
         self.geometry_name = 'Cylinder'
@@ -96,6 +98,7 @@ class Cylinder(Geometry):
         return True
 
     def particle_in_geometry(self, particles):
+    
         ginfo = self.geometry_info
         r, lo, hi = ginfo['radius'], ginfo['lo'], ginfo['hi']
         dim = ['x', 'y', 'z'].index(ginfo['dim'])
@@ -157,12 +160,9 @@ class Cylinder(Geometry):
         
         grids = np.array(grids)
         
-        _grids = self.mark_grid(grids)
-        
-        if np.sum(_grids - grids)!=0:
-            print(_grids)
+        grids = self.mark_grid(grids)
 
-        if replace:
+        if replace or self.grids is None:
             self.a = a
             self.grids = grids
         else:
@@ -173,6 +173,7 @@ class Cylinder(Geometry):
         ginfo = self.geometry_info
         r, lo, hi = ginfo['radius'], ginfo['lo'], ginfo['hi']
         dim = ['x', 'y', 'z'].index(ginfo['dim'])
+        
         _grids = self._mark_grid(dim=dim, r=r, lo=lo, hi=hi, grids=grids)
         
         return _grids
@@ -182,19 +183,21 @@ class Cylinder(Geometry):
     def _mark_grid(dim, r, lo, hi, grids):
         
         ngrids = grids.shape[0]
+        r2 = r*r
         
         for gid in prange(ngrids):
             
             grid = grids[gid]
             xl, xh, yl, yh, zl, zh = grid[:6]
             
+            ld, hd = xl, xh
             l1, h1, l2, h2 = yl, yh, zl, zh
             if dim == 1:
                 l1, h1 = xl, xh
-                xl, xh = yl, yh
+                ld, hd = yl, yh
             elif dim == 2:
                 l2, h2 = xl, xh
-                xl, xh = zl, zh
+                ld, hd = zl, zh
             
             all_rs = np.zeros(4)
             all_rs[0], all_rs[1] = l1*l1 + l2*l2, l1*l1 + h2*h2
@@ -202,23 +205,27 @@ class Cylinder(Geometry):
             
             max_r, min_r = np.max(all_rs), np.min(all_rs)
             
-            r = r*r
-            if min_r >= r or xl<=lo or xh>=hi:
-                grid[-1] = 2
-            elif max_r > r and min_r < r:
-                grid[-1] = 1
-        
+            if min_r >= r2 or ld<=lo or hd>=hi:
+                grid[-1] = 2.
+            elif max_r > r2 and min_r < r2:
+                grid[-1] = 1.
+            
+            grids[gid] = grid
+            
         return grids 
     
     def get_grid(self):
+    
         if self.grids is None:
-            self.construct_grid(self, a=1)
+            self.construct_grid(a=self.a)
+    
         return self.grids
 
     def shift_grid(self):
 
         vec = np.random.random(3)*0.5 + 0.5
         total_vec = vec + self.shift_vec
+        
         if total_vec[0]>=1 or total_vec[0]<=-1:
             vec[0] = -vec[0]
         if total_vec[1]>=1 or total_vec[1]<=-1:
@@ -246,6 +253,7 @@ class Cylinder(Geometry):
         dim = ['x', 'y', 'z'].index(ginfo['dim'])
 
         if rule.lower()=='reverse':
+            
             return self.reverse(posi, old_posi, velo, dim, r, lo, hi)
 
     @staticmethod
@@ -267,7 +275,6 @@ class Cylinder(Geometry):
             ov = velo[pid] # old velocity
 
             pp, pv = cp, ov
-            
             
             _r2 = cp[idr1]*cp[idr1] + cp[idr2]*cp[idr2]
             r2 = r*r

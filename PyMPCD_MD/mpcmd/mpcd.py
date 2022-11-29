@@ -76,10 +76,10 @@ class MPCD(object):
         fluid.create_fluid(self.geometry, position, velocity, N, density, mass, kbt)
         self.fluid = fluid
     
-    def add_solute(self, position=None, velocity=None, N=0, mass=10.0):
+    def add_solute(self, md_sys):
 
         solute = Solute()
-        solute.create_solute(self, position, velocity, N, mass)
+        solute.create_solute(md_sys)
         sid = self.fluid.ids[-1]+1
         solute.ids = np.linspace(sid, sid + solute.N-1, solute.N).astype(int)
         self.solute = solute
