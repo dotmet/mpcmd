@@ -46,5 +46,9 @@ m.add_solute(Hoomd_Parser(hmd))
 #m.logger(period=1000, objects=['fluid'], fnames=['test_fluid.gsd'])
 #m.logger(period=1000, objects=['fluid', 'solute'], fnames=['fluid.gsd', 'solute.gsd'])
 
-# Equibrium
+# Relax
 m.run(2e4, mute=1e3)
+
+# Add external force field
+m.add_force(a=0.1, direction=[0,0,1])
+m.run(1e4, mute=1e3)
