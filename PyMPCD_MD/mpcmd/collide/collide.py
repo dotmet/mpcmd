@@ -1,10 +1,10 @@
-import numpy as np
+import time
 
+import numpy as np
+from numba import jit, njit, prange
 from scipy.special import gamma
 from scipy.stats import maxwell
 
-import time
-from numba import njit, prange, jit
 
 class Collide(object):
 
@@ -92,7 +92,7 @@ class Collide(object):
                 mass = masses[pids]
                 vs = velo[pids]
                 
-                # # Add ghost particles
+                # Add ghost particles
                 Nsp = 0
                 Psp = np.zeros(3) 
                 if grid[6] == 1.0:
@@ -100,9 +100,9 @@ class Collide(object):
                     if Nall_ > gnps:
                         Nsp = Nall_ - gnps
                         Pvar = Nsp*kbt
-                        Psps = np.random.randn(1, 3)
-                        Psp = np.power(Pvar, 1/3) * np.sum(Psps, axis=0)
-                    # print(Nsp, Psp)
+                        Psps = np.random.standard_normal(size=(3, 3))
+                        Psps = np.sqrt(np.sum(Psps*Psps, axis=1)) - 1.6
+                        Psp = Psps*Pvar/0.45
                 # End
                     
                 pcm = np.sum(vs*mass, axis=0) + Psp

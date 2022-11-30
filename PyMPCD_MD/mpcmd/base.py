@@ -307,6 +307,7 @@ class Visualize(object):
             vs = np.mean(vs, axis=1)
         plt.plot(locs, vs)
         plt.show()
+        return locs, vs
 
     def density(self, plane='xoy', loc=None, grid_length=1, contain_solute=False):
         
