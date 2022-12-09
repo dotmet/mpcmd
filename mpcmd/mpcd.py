@@ -156,9 +156,12 @@ class MPCD(object):
         else:
             self.Collide.thermo = thermo
     
+    def reset_timestep(self, step):
+        self.step = step
+    
     # @profile
-    def run(self, nruns=1, mute=False):
-
+    def run(self, nruns=1, mute=1e3):
+        
         if type(mute) in [int, float]:
             mute = int(mute)
         elif type(mute) == bool:
@@ -185,12 +188,12 @@ class MPCD(object):
         start = self.step
         end = start + nruns
         
-        print('Start running ...')
+        print('Running ...')
         
         Tps = []
         for i in range(self.step, self.step+int(nruns)+1, self.period):
         
-            if isinstance(mute, int):
+            if not isinstance(mute, bool):
                 if i%mute==0:
                     self.mute = False
                 else:

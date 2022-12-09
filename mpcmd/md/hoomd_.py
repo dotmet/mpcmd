@@ -74,7 +74,7 @@ class Hoomd(object):
             origin = ginfo['c1']
             
             wall = hoomd.md.wall.cylinder(r=r, origin=origin, axis=axis, inside=True)
-            wall_force_fslj = wall.force_shifted_lj(wall, r_cut=1.22)
+            wall_force_fslj = wall.force_shifted_lj(wall, r_cut=1.122)
             for typ in particle_types:
                 wall_force_fslj.force_coeff.set(typ, epsilon=1.0, sigma=1.0)
                 
@@ -161,13 +161,22 @@ class Hoomd(object):
         hoomd.dump.gsd(file_name, period=period, group=group, overwrite=overwrite)
         
 
-class Hoomd_Parser(object):
+class HoomdParser(object):
     
     def __init__(self, _hoomd, _hoomd_system=None, notice_level=0, msg_file=None):
         
         if isinstance(_hoomd, Hoomd):
             _hoomd_system = _hoomd.system
             _hoomd = _hoomd.hoomd
+        else:
+            if _hoomd_system is None:
+                msg = '''
+                Your are using standard hoomd package, the 'hoomd.md.system_data' should be provided!
+                Dont know how to take and pass the 'hoomd.md.system_data' data ? Try this:
+                >>> md_system = hoomd.init.read_snapshot(...) # you can also use other initialize method 
+                >>> HoomdParser(_hoomd=hoomd, _hoomd_system=md_system)
+                '''
+                raise ValueError(msg)
         
         self.hoomd = _hoomd
         self.md_sys = _hoomd_system

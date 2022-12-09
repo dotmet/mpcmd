@@ -1,5 +1,5 @@
 from mpcmd.md import Hoomd
-from mpcmd.md import Hoomd_Parser
+from mpcmd.md import HoomdParser
 
 from mpcmd import MPCD
 from mpcmd.geometry import Cylinder
@@ -43,7 +43,7 @@ hmd.angle_cosine('a', k=0, t0=np.pi)
 #hmd.dump_gsd('test_solute.gsd', period=1000)
 
 # Add MD to MPCD system
-m.add_solute(Hoomd_Parser(hmd, msg_file='hoomd_notice.log'))
+m.add_solute(HoomdParser(hmd, msg_file='hoomd_notice.log'))
 
 # Save trajectory for MPCD
 #m.logger(period=1000, objects=['fluid'], fnames=['test_fluid.gsd'])
