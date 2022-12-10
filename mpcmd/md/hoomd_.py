@@ -2,7 +2,8 @@ try:
     import hoomd
     import hoomd.md
 except:
-    raise ImportError('The module [hoomd] has not yet been installed!')
+    # raise ImportError('The module [hoomd] has not yet been installed!')
+    pass
 
 import numpy as np
 

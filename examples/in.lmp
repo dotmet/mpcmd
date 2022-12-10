@@ -1,0 +1,38 @@
+# Sphere-chain system
+
+dimension    	3
+boundary		p p p
+units          	lj
+atom_style	    molecular
+neighbor		0.3 bin
+neigh_modify	every 1 delay 10 check yes page 100000 one 4000
+special_bonds   	fene
+
+read_data      	data.lmp
+mass            * 1
+
+pair_style      lj/cut 1.122 
+pair_coeff		* * 1.0 1.0
+#pair_coeff		1 2 0.1 1.0
+bond_style	    fene
+bond_coeff	    * 30.0 30.0 1.0 1.0
+angle_style	    cosine
+angle_coeff	    * 30
+
+#compute         1 all pe/atom
+#compute        	2 all property/atom fx fy fz
+
+# define groups
+group		    chain 	type 1 
+group		    ring		type 2
+
+# initial velocities
+velocity		all create 1.0 4928459 rot yes dist gaussian
+fix             	1 all 	        nvt temp 1.0 1.0 1000.0 
+
+timestep		0.005
+thermo		1000
+
+dump		1 all custom 10000 lmp.test.lammpstrj id type x y z
+
+run		1000

@@ -1,2 +1,2 @@
 from .hoomd_ import Hoomd, HoomdParser
-from .lammps_ import Lammps
+from .lammps_ import LammpsParser
