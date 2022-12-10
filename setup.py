@@ -2,13 +2,13 @@ import sys
 import os
 from setuptools import setup, find_packages
 
-__version__ = "0.0.2"
+__version__ = "0.0.1"
 
 with open('README.md', 'r', encoding='utf-8') as fh:
     long_description = fh.read()
 
 setup(
-    name = "PyMPCD_MD",
+    name = "mpcmd",
     version = __version__,
     author = "Even Wong",
     author_email = "evenwong@stu.cdut.edu.cn",
