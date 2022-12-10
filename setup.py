@@ -14,7 +14,7 @@ setup(
     author_email = "evenwong@stu.cdut.edu.cn",
     url = "https://github.com/Gddr100x/PyMPCD-MD",
     description = "A python-based simulation package about mpcd and md.",
-    long_description = long_description,
+    long_description = "A python-based simulation package about mpcd and md.",
     extras_require = {},
     packages = find_packages(),
     zip_safe = False,
