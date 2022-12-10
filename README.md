@@ -1,13 +1,31 @@
 # PyMPCD-MD
 A fully extensible hydrodynamic simulation package
 
-# Install package
-```Bash
-cd PyMPCD_MD
-python setup.py install
-```
+Installation
+------------
 
-# Example
+you can install it with::
+
+  $ python setup.py install
+
+
+Requirements
+~~~~~~~~~~~~
+
+If you are using Lammps for MD simulation, you need to install lammps Python module.
+ 
+You can install this module by following: https://docs.lammps.org/Python_module.html,
+or just use following commands (recommend):
+  
+  $ conda install -c conda-forge lammps
+
+If you are using Lammps for MD simulation, you need to install lammps Python module.
+ 
+You can install this module by using this command (recommend):
+  
+  $ conda install -c conda-forge "hoomd=2.9.7"
+
+# Example usage
 ```Python
 # Import Modules
 from mpcmd import MPCD
