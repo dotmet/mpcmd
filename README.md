@@ -1,11 +1,11 @@
-# mpcmd
+# Mpcmd
 An extensible hydrodynamic simulation package
 
 # Installation
 
 you can install it with:
 ```
-  $ pip install PyMPCD-MD
+  $ pip install mpcmd
 ```
 or clone this repository and run:
 ```
