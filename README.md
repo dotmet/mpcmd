@@ -1,4 +1,4 @@
-# PyMPCD-MD
+# mpcmd
 An extensible hydrodynamic simulation package
 
 # Installation
