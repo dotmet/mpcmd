@@ -7,7 +7,7 @@ import numpy as np
 
 class LammpsParser(object):
     
-    def __init__(self, lmp=None, infile=None, datafile=None):
+    def __init__(self, lmp=None, infile=None, datafile=None, mute_lammps=True):
         
         if lmp is None:
             if infile is None:
@@ -28,8 +28,10 @@ class LammpsParser(object):
                     >>> LammpsParser(lmp=lmp)
                 '''
                 raise ValueError(msg)
-                
-            lmp = lammps(cmdargs=["-screen", "none"])
+            if mute_lammps:
+                lmp = lammps(cmdargs=["-screen", "none"])
+            else:
+                lmp = lammps()
             lmp.file(infile)
             
         self.lammps = lmp
