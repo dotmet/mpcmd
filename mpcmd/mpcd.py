@@ -228,7 +228,7 @@ class MPCD(object):
                 eta_msg = f'ETA {np.round(eta, 1)} s'
 
                 if eta/(60*60*24) >= 1:
-                    eta_msg = f'ETA {np.round(eta/(60*60*3600), 1)} day'
+                    eta_msg = f'ETA {np.round(eta/(60*60*24), 1)} day'
                 elif eta/3600 >= 1:
                     eta_msg = f'ETA {np.round(eta/3600, 1)} h'
                 elif eta/60 >= 1:
