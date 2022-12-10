@@ -5,6 +5,10 @@ An extensible hydrodynamic simulation package
 
 you can install it with:
 ```
+  $ pip install PyMPCD-MD
+```
+or clone this repository and run:
+```
   $ python setup.py install
 ```
 
