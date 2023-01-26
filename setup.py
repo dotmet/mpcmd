@@ -12,7 +12,7 @@ setup(
     author = "Even Wong",
     version = __version__,
     author_email = "evenwong@stu.cdut.edu.cn",
-    url = "https://github.com/Gddr100x/mpcmd",
+    url = "https://github.com/dotmet/mpcmd",
     description = "A python-based simulation package about mpcd and md.",
     long_description = long_description,
     long_description_content_type = 'text/markdown',
