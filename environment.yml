@@ -1,0 +1,12 @@
+name: mpcmd-dev
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy
+  - matplotlib
+  - script
+  - numba
+  - gsd
+  - memory_profiler
+  - seaborn
