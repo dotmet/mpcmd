@@ -5,7 +5,7 @@ channels:
 dependencies:
   - numpy
   - matplotlib
-  - script
+  - scipy
   - numba
   - gsd
   - memory_profiler
