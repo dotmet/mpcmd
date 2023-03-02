@@ -89,7 +89,7 @@ class Fluid(object):
             
         self.position = position
         self.velocity = velocity
-        self.ids = np.linspace(0, N-1, N).astype(int)
+        self.ids = np.arange(N)
 
         print(f'Fluid has been initialized with {self.N} particles.')
         print(f'Current fluid particle density is {self.density}.')
