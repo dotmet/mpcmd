@@ -85,9 +85,7 @@ class Fluid(object):
                 
         if velocity is None:
             scales = np.sqrt(KbT/arr([mass]*N))
-            mean = 2*scales*np.sqrt(2/np.pi)
-            velocity = maxwell.rvs(scale=np.sqrt(KbT/mass), size=(self.N, 3))
-            velocity = velocity - np.stack([mean, mean, mean], axis=1)
+            velocity = scales*np.random.randn(size=(self.N,3))
             
         self.position = position
         self.velocity = velocity
