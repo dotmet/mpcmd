@@ -84,7 +84,7 @@ class Fluid(object):
                 velocity = None
                 
         if velocity is None:
-            scales = np.sqrt(KbT/arr([mass])).T
+            scales = np.sqrt(KbT/mass)
             velocity = scales*np.random.randn(self.N,3)
             
         self.position = position
