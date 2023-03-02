@@ -100,9 +100,7 @@ class Collide(object):
                     if Nall_ > gnps:
                         Nsp = Nall_ - gnps
                         Pvar = Nsp*kbt
-                        Psps = np.random.standard_normal(size=(3, 3))
-                        Psps = np.sqrt(np.sum(Psps*Psps, axis=1)) - 1.6
-                        Psp = Psps*Pvar/0.45
+                        Psp = Pvar*np.random.randn(3)
                 # End
                     
                 pcm = np.sum(vs*mass, axis=0) + Psp
