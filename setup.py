@@ -2,7 +2,7 @@ import sys
 import os
 from setuptools import setup, find_packages
 
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 with open('README.md', 'r', encoding='utf-8') as fh:
     long_description = fh.read()
@@ -13,7 +13,7 @@ setup(
     version = __version__,
     author_email = "wdyphy@zju.edu.cn",
     url = "https://github.com/dotmet/mpcmd",
-    description = "A python-based simulation package combines mpcd and md.",
+    description = "A python-based simulation package using mpcd and md.",
     long_description = long_description,
     long_description_content_type = 'text/markdown',
     packages = find_packages(),
