@@ -1,34 +1,48 @@
-name: Python Package using Conda
+name: Conda
 
-on: [push]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-linux:
-    runs-on: ubuntu-latest
+  build:
     strategy:
-      max-parallel: 5
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.8", "3.10"]
+
+    runs-on: ${{ matrix.platform }}
+
+    # The setup-miniconda action needs this to activate miniconda
+    defaults:
+      run:
+        shell: "bash -l {0}"
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: '3.10'
-    - name: Add conda to system path
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
-    - name: Install dependencies
-      run: |
-        conda env update --file environment.yml --name base
-    - name: Lint with flake8
-      run: |
-        conda install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        conda install pytest
-        pytest
+      - uses: actions/checkout@v3
+
+      - name: Get conda
+        uses: conda-incubator/setup-miniconda@v2.2.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          channels: conda-forge
+
+      - name: Prepare
+        run: conda install conda-build conda-verify
+
+      - name: Build
+        run: conda build conda.recipe
+
+      - name: Install
+        run: conda install -c ${CONDA_PREFIX}/conda-bld/ mpcmd
+
+      - name: Test
+        run: python tests/test.py
