@@ -1,0 +1,32 @@
+package:
+  name: mpcmd
+  version: 0.0.4
+
+source:
+  path: ..
+
+build:
+  number: 0
+  script: {{ PYTHON }} -m pip install . -vvv
+
+requirements:
+
+  host:
+    - python
+    - pip
+
+  run:
+    - python
+
+
+test:
+  imports:
+    - mpcmd
+  source_files:
+    - tests
+  commands:
+    - python tests/test.py
+
+about:
+  summary: An simulation package.
+  license_file: LICENSE
