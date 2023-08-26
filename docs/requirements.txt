@@ -1,0 +1,11 @@
+numpy
+sphinx
+furo
+tornado
+sphinx_rtd_theme
+tqdm
+gsd
+matplotlib
+scipy
+numba
+memory_profiler
