@@ -162,12 +162,12 @@ class Logger(object):
     
     def write_gsd(self, obj, file_name, step):
 
-        mode = 'rb+'
+        mode = 'r+'
         if obj and step>=self.start:
 
             if step==self.start:
                 if self.overwrite or (not os.path.exists(file_name)):
-                    mode = 'wb'
+                    mode = 'w'
 
             trj = gsd.hoomd.open(file_name, mode)
             snap = make_snapshot(obj, step)
