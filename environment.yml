@@ -1,4 +1,4 @@
-name: mpcmd-dev
+name: mpcmd
 channels:
   - conda-forge
   - defaults
