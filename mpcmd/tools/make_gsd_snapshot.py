@@ -2,7 +2,7 @@ import gsd.hoomd
 
 def make_snapshot(obj, step=0):
 
-    s = gsd.hoomd.Snapshot()
+    s = gsd.hoomd.Frame()
     s.configuration.step = step
     s.particles.N = obj.N
     s.particles.position = obj.position
