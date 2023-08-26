@@ -10,3 +10,4 @@ scipy
 numba
 memory_profiler
 seaborn
+mpcmd
