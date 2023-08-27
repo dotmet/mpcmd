@@ -3,7 +3,7 @@ package:
   version: 0.0.4
 
 source:
-  path: ..
+  path: https://github.com/dotmet/mpcmd.git
 
 build:
   number: 0
