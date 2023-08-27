@@ -3,7 +3,7 @@ package:
   version: 0.0.4
 
 source:
-  path: https://github.com/dotmet/mpcmd.git
+  url: https://github.com/dotmet/mpcmd/archive/refs/tags/test-1.tar.gz
 
 build:
   number: 0
