@@ -25,7 +25,7 @@ test:
   source_files:
     - tests
   commands:
-    - python tests/test.py
+    - python tests/test_import.py
 
 about:
   summary: An simulation package.
