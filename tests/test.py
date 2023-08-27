@@ -1,3 +1,3 @@
 import mpcmd
 
-assert __version__ == "0.0.4"
+assert mpcd.__version__ == "0.0.4"
