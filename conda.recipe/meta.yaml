@@ -3,8 +3,7 @@ package:
   version: 0.0.4
 
 source:
-  url: https://files.pythonhosted.org/packages/6c/8f/11151dd66b27286d1be55a93592f70701696e4fb347ab388e6bb407ba7c8/mpcmd-0.0.4.tar.gz
-  sha256: d6aefb5d98fff3420d8544bf5a383b0364d95028c2558c3df0019ac0cbaf44cb
+  path: ..
 
 build:
   number: 0
