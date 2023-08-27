@@ -17,7 +17,13 @@ requirements:
 
   run:
     - python
-
+    - numpy
+    - matplotlib
+    - scipy
+    - numba
+    - gsd
+    - memory_profiler
+    - seaborn
 
 test:
   imports:
