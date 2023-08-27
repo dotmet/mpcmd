@@ -45,4 +45,4 @@ jobs:
         run: conda install -c ${CONDA_PREFIX}/conda-bld/ mpcmd
 
       - name: Test
-        run: python tests/test.py
+        run: python tests/test_import.py
