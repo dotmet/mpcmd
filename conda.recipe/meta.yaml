@@ -37,7 +37,7 @@ about:
   home: https://github.com/dotmet/mpcmd
   summary: 'Extensible mpcd fluid simulation package'
   description: |
-  An extensible fluid simulation package which combines multiple MPCD and md methods.
+    An extensible fluid simulation package which combines multiple MPCD and md methods.
   # Remember to specify the license variants for BSD, Apache, GPL, and LGPL.
   # Use the SPDX identifier, e.g: GPL-2.0-only instead of GNU General Public License version 2.0
   # See https://spdx.org/licenses/
