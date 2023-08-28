@@ -24,6 +24,7 @@ requirements:
     - gsd
     - memory_profiler
     - seaborn
+    - scikit-learn
 
 test:
   imports:

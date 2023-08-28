@@ -4,6 +4,7 @@ import numpy as np
 from numba import jit, njit, prange
 from scipy.special import gamma
 from scipy.stats import maxwell
+from sklearn.neighbors import KDTree
 
 
 class Collide(object):
@@ -46,9 +47,9 @@ class Collide(object):
             self.fluid_density = 1
 
         s = time.time()
+        # res_velo = self.np_collide(grids, posi, velo, mass, self.alpha, self.fluid_density, self.kbt)
+        res_velo = self.kdtree_collide(grids, posi, velo, mass, self.alpha, self.fluid_density, self.kbt)
         
-        res_velo = self.np_collide(grids, posi, velo, mass, self.alpha, self.fluid_density, self.kbt)
-
         if fluid and solute:
             mpcd_sys.fluid.velocity[:] = res_velo[fluid.ids]
             mpcd_sys.solute.velocity[:] = res_velo[solute.ids]
@@ -148,3 +149,83 @@ class Collide(object):
                 break
 
         return velo
+
+    def kdtree_collide(self, grids, posi, velo, masses, alpha, avg_ps, kbt):
+        
+        ngrids = grids.shape[0]
+        masses = masses.reshape(-1,1)
+        
+        ca = np.cos(alpha)
+        sa = np.sin(alpha)
+        
+        grid_center = np.array([grids[:,0]+grids[:,1], grids[:,2]+grids[:,3], grids[:,4]+grids[:,5]])/2
+        tree = KDTree(posi, metric='chebyshev')
+        sort_by_grids = tree.query_radius(grid_center.T, r=0.5)
+        
+        for gid in range(ngrids):
+            pids = sort_by_grids[gid]
+            vs = velo[pids]
+            mass = masses[pids]
+            grid = grids[gid]
+            if len(pids)>0:
+                velo[pids] = self.collide_by_grid(vs, mass, avg_ps, kbt, grid, ca, sa)
+        
+        return velo
+
+    @staticmethod
+    @njit(cache=True)
+    def collide_by_grid(vs, mass, avg_ps, kbt, grid, ca, sa):
+        
+        gnps = vs.shape[0] # # of particles in current grid
+        # Add ghost particles
+        Nsp = 0
+        Psp = np.zeros(3) 
+        if grid[6] == 1.0:
+            Nall_ = np.random.poisson(lam=avg_ps)
+            if Nall_ > gnps:
+                Nsp = Nall_ - gnps
+                Pvar = Nsp*kbt
+                Psp = Pvar*np.random.randn(3)
+        # End
+            
+        pcm = np.sum(vs*mass, axis=0) + Psp
+        m_all = np.sum(mass) + Nsp
+        vcm = pcm / m_all
+
+        phi = 2*np.pi*np.random.rand()
+        theta = 2*np.random.rand() - 1.0
+
+        nx = np.cos(phi)*np.sqrt(1-theta**2)
+        ny = np.sin(phi)*np.sqrt(1-theta**2)
+        nz = theta
+        
+        mat = np.zeros((3,3))
+
+        mat[0,0] = ca + nx*nx*(1-ca)
+        mat[0,1] = nx*ny*(1-ca) - nz*sa
+        mat[0,2] = nx*nz*(1-ca) + ny*sa
+        mat[1,0] = nx*ny*(1-ca) + nz*sa
+        mat[1,1] = ca + ny*ny*(1-ca)
+        mat[1,2] = ny*nz*(1-ca) - nx*sa
+        mat[2,0] = nx*nz*(1-ca) - ny*sa
+        mat[2,1] = ny*nz*(1-ca) + nx*sa
+        mat[2,2] = ca + nz*nz*(1-ca)
+        
+        # MBS Thermostat
+        d_vs = vs - vcm
+        d_Ek = np.sum(d_vs*d_vs*mass*0.5)
+        _k = 3*(gnps-1)/2
+        if _k==0:
+            _k = 0.01
+        _Ek = np.random.gamma(_k, kbt)
+        
+        if d_Ek==0 or _Ek==0:
+            factor = 1
+        else:
+            factor = np.sqrt(_Ek/d_Ek)
+            
+        vres = vcm + factor*np.dot(d_vs, mat)
+        
+        return vres
+                
+            

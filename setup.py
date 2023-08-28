@@ -27,5 +27,6 @@ setup(
         'gsd',
         'memory_profiler',
         'seaborn',
+        'scikit-learn',
         ],
 )
