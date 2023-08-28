@@ -14,13 +14,31 @@ try:
 except:
     pass
 
-from scipy.stats import maxwell
-from scipy.special import gamma
-
-from copy import deepcopy
 import os
 
 class Fluid(object):
+    '''
+    The fluid class is used to initialize, manipulate the fluid particles.
+    
+    Parameters
+    ----------
+        None
+        
+    Attributes
+    ----------
+        position: numpy.ndarray
+            The positions of fluid particles.
+        velocity: numpy.ndarray
+            The velocities of fluid particles.
+        N: int
+            The number of fluid particles.
+        mass: float
+            The mass of fluid particles.
+        density: float
+            The density of fluid particles.
+        ids: numpy.ndarray
+            The ids of fluid particles.
+    '''
     
     def __init__(self):
         
@@ -32,7 +50,31 @@ class Fluid(object):
 
         self.ids = []
     
-    def create_fluid(self, geometry=None, position=None, velocity=None, N=0, density=5, mass=1.0, KbT=1.0):  
+    def create_fluid(self, geometry=None, position=None, velocity=None, N=0, density=5, mass=1.0, KbT=1.0):
+        '''
+        A method to initialize fluid particles.
+        
+        Parameters
+        ----------
+            geometry: mpcmd.geometry.Geometry
+                The geometry object.
+            position: numpy.ndarray
+                The positions of fluid particles.
+            velocity: numpy.ndarray
+                The velocities of fluid particles.
+            N: int
+                The number of fluid particles.
+            density: float
+                The density of fluid particles.
+            mass: float
+                The mass of fluid particles.
+            KbT: float
+                The temperature of fluid particles.
+        
+        Returns
+        -------
+            None
+        '''
 
         print('Initializing fluid ...')
         
@@ -95,7 +137,26 @@ class Fluid(object):
         print(f'Current fluid particle density is {self.density}.')
 
 class Solute(object):
+    '''
+    The class to initialize, manipulate the solute particles.
     
+    Parameters
+    ----------
+        None
+        
+    Attributes
+    ----------
+        position: numpy.ndarray
+            The positions of solute particles.
+        velocity: numpy.ndarray
+            The velocities of solute particles.
+        N: int
+            The number of solute particles.
+        mass: float
+            The mass of solute particles.
+        ids: numpy.ndarray
+            The ids of solute particles.
+    '''
     def __init__(self):
         
         self.position = []
@@ -107,7 +168,18 @@ class Solute(object):
         self.md_sys = None
         
     def create_solute(self, md_sys):
+        '''
+        Method to initialize solute particles.
         
+        Parameters
+        ----------
+            md_sys: mpcmd.md.MDSystem
+                The MDSystem object.
+        
+        Returns
+        -------
+            None
+        '''
         self.md_sys = md_sys
         self.position = md_sys.take_position()
         self.velocity = md_sys.take_velocity()
@@ -115,7 +187,20 @@ class Solute(object):
         self.mass = md_sys.mass
                 
     def run_md_simulation(self, steps, mute=False):
-
+        '''
+        Method to run MD simulation for solute particles.
+        
+        Parameters
+        ----------
+            steps: int
+                The number of steps to run.
+            mute: bool
+                Whether to print the running information.
+                
+        Returns
+        -------
+            None
+        '''
         self.md_sys.reset_velocity(self.velocity)
         self.md_sys.run(steps, mute)
         
@@ -124,7 +209,27 @@ class Solute(object):
         
         
 class Force(object):
+    '''
+    The class to initialize and apply the external force field.
     
+    Parameters
+    ----------
+        a: float
+            The amplitude of external force.
+        direction: array like
+            The direction of external force.
+            
+    Attributes
+    ----------
+        vec: numpy.ndarray
+            The vector of external force.
+        x: float or function
+            The x component of external force.
+        y: float or function
+            The y component of external force.
+        z: float or function
+            The z component of external force.
+    '''
     def __init__(self, a, direction):
         
         self.vec = a*np.array(direction, dtype=float)
@@ -133,7 +238,19 @@ class Force(object):
         self.z = self.vec[2]
     
     def get_vector(self, t=0):
+        '''
+        Get the vector of external force.
         
+        Parameters
+        ----------
+            t: float
+                The time step of simulation.
+        
+        Returns
+        -------
+            numpy.ndarray
+                The vector of external force.
+        '''
         fx, fy, fz = self.x, self.y, self.z
         
         if callable(self.x):
@@ -146,7 +263,35 @@ class Force(object):
         return arr([fx, fy, fz], dtype=float)        
 
 class Logger(object):
+    '''
+    The class to log the simulation information.
     
+    Parameters
+    ----------
+        period: int
+            The period to log the simulation information.
+        items: list
+            The items to log.
+        file_name: str
+            The file name to save the log information.
+        start: int
+            The step to start logging.
+        overwrite: bool
+            Whether to overwrite the existing file.
+    
+    Attributes
+    ----------
+        period: int
+            The period to log the simulation information.
+        items: list
+            The items to log.
+        file_name: str
+            The file name to save the log information.
+        start: int
+            The step to start logging.
+        overwrite: bool
+            Whether to overwrite the existing file.
+    '''
     def __init__(self, period=1000, objects=['fluid', 'solute'], 
                  items=['position', 'velocity'], object_seperate=True, 
                  fnames=[None], ftypes=['gsd'], start=0, overwrite=True):
@@ -157,11 +302,26 @@ class Logger(object):
         self.object_seperate = object_seperate
         self.file_names = fnames
         self.file_types = ftypes
-        self.start = 0
+        self.start = start
         self.overwrite = overwrite
     
     def write_gsd(self, obj, file_name, step):
-
+        '''
+        Write the simulation information to gsd file.
+        
+        Parameters
+        ----------
+            obj: mpcmd.base.Fluid or mpcmd.base.Solute
+                The object to log.
+            file_name: str
+                The file name to save the log information.
+            step: int
+                The current step of simulation.
+        
+        Returns
+        -------
+            None
+        '''
         mode = 'r+'
         if obj and step>=self.start:
 
@@ -175,13 +335,47 @@ class Logger(object):
             trj.close()
             
     def write_xyz(self, obj, file_name, step):
+        '''
+        Write the simulation information to xyz file.
+        
+        Parameters
+        ----------
+            obj: mpcmd.base.Fluid or mpcmd.base.Solute
+                The object to log.
+            file_name: str
+                The file name to save the log information.
+            step: int
+                The current step of simulation.
+        '''
         pass
     
     def write_lammpstrj(self, obj, file_name, step):
+        '''
+        Write the simulation information to lammpstrj file.
+        
+        parameters
+        ----------
+            obj: mpcmd.base.Fluid or mpcmd.base.Solute
+                The object to log.
+            file_name: str
+                The file name to save the log information.
+            step: int
+                The current step of simulation.
+        '''
         pass
         
     def dump(self, mpcd_sys):
+        '''
+        Dump the simulation information to file with given format.
         
+        Parameters
+        ----------
+            mpcd_sys: mpcmd.mpcd.MPCDSystem
+        
+        Returns
+        -------
+            None
+        '''        
         fluid, solute = mpcd_sys.fluid, mpcd_sys.solute
         step = mpcd_sys.step
 
@@ -225,7 +419,37 @@ class Analyzer(object):
         pass
 
 class Visualize(object):
-
+    '''
+    Visualize the fluid.
+    
+    Parameters
+    ----------
+        mpcd_sys: mpcmd.mpcd.MPCDSystem
+            The MPCDSystem object.
+    
+    Attributes
+    ----------
+        mpcd_sys: mpcmd.mpcd.MPCDSystem
+            The MPCDSystem object.
+        fluid: mpcmd.base.Fluid
+            The fluid object.
+        solute: mpcmd.base.Solute
+            The solute object.
+        geometry: mpcmd.geometry.Geometry
+            The geometry object.
+        box: numpy.ndarray
+            The bounding box of geometry.
+        grid_length: float
+            The length of grid.
+        plane: str
+            The plane to visualize.
+        loc: float
+            The location of plane.
+        contain_solute: bool
+            Whether to contain solute particles.
+        sorted_data: dict
+            The sorted data.
+    '''
     def __init__(self, mpcd_sys=None):
 
         self.mpcd_sys = mpcd_sys
@@ -243,7 +467,28 @@ class Visualize(object):
 
 
     def velocity_field(self, plane='xoy', loc=None, grid_length=1, contain_solute=False, transpose=False, show=True):
+        '''
+        Show the velocity field in given plane.
         
+        Parameters
+        ----------
+            plane: str
+                The plane to visualize.
+            loc: float
+                The location of plane.
+            grid_length: float
+                The length of grid.
+            contain_solute: bool
+                Whether to contain solute particles.
+            transpose: bool
+                Whether to transpose the velocity field.
+            show: bool
+                Whether to show the velocity field.
+        
+        Returns
+        -------
+            None
+        '''
         if self.grid_length!=grid_length and self.plane!=plane and contain_solute!=self.contain_solute and loc==self.loc:
             if self.sorted_data['grids'] is None:
                 self.sort_by_grids(plane, loc, grid_length, contain_solute)
@@ -277,7 +522,20 @@ class Visualize(object):
             return alist, blist, valist, vblist
     
     def velocity_distribution(self, bins=100, axis='x'):
-
+        '''
+        Show the velocity distribution.
+        
+        Parameters
+        ----------
+            bins: int
+                The number of bins.
+            axis: str
+                The axis to get the velocity distribution.
+        
+        Returns
+        -------
+            None
+        '''
         velo = self.fluid.velocity
         if axis=='x':
             vs = velo[:,0]
@@ -292,6 +550,29 @@ class Visualize(object):
         plt.show()
 
     def velocity_profile(self, plane='xoz', plane_loc=None, loc_cross=0.0, grid_length=1, dim=1):
+        '''
+        Get the velocity profile in given plane.
+        
+        Parameters
+        ----------
+            plane: str
+                The plane to visualize.
+            plane_loc: float
+                The location of plane.
+            loc_cross: float
+                The location to cross the plane.
+            grid_length: float
+                The length of grid.
+            dim: int
+                The dimension to get the velocity profile.
+        
+        Returns
+        -------
+            locs: numpy.ndarray
+                The locations of blocks.
+            vs: numpy.ndarray
+                The velocity profile.
+        '''
         alist, blist, valist, vblist=self.velocity_field(plane, plane_loc, grid_length, show=False)
         als, nas = np.unique(alist, return_counts=True)
         bls, nbs = np.unique(blist, return_counts=True)
