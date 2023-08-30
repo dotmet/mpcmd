@@ -1,30 +1,31 @@
+{% set name = "mpcmd" %}
+{% set version = "0.0.6" %}
+
 package:
-  name: mpcmd
-  version: 0.0.6
+  name: {{ name|lower }}
+  version: {{ version }}
 
 source:
-  path: ..
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: 5d89c2a6716af90cf264b28faa0f1a9767ec155bb1b8c3ed854746634b6561b2
 
 build:
   number: 0
   script: {{ PYTHON }} -m pip install . -vvv
 
 requirements:
-
   host:
     - python
     - pip
-
   run:
     - python
     - numpy
-    - matplotlib
+    - matplotlib-base
     - scipy
     - numba
     - gsd
     - memory_profiler
     - seaborn
-    - scikit-learn
 
 test:
   imports:
