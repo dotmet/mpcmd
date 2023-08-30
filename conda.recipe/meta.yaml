@@ -10,11 +10,9 @@ build:
   script: {{ PYTHON }} -m pip install . -vvv
 
 requirements:
-
   host:
     - python
     - pip
-
   run:
     - python
     - numpy
