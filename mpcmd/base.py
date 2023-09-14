@@ -1,5 +1,6 @@
 from warnings import WarningMessage
 from .tools.make_gsd_snapshot import make_snapshot
+from .geometry.grid import Grid3D
 
 from numba import prange, jit, njit
 
@@ -465,8 +466,94 @@ class Visualize(object):
 
         self.sorted_data = {'grids':None, 'particles':None, 'vcm':None}
 
+        self.Grid3d = Grid3D(grid_length=1, geometry=self.geometry)
 
-    def velocity_field(self, plane='xoy', loc=None, grid_length=1, contain_solute=False, transpose=False, show=True):
+    def velocity_field(self, plane='xoy', dim=None, loc=None, agg_method=np.nanmean, 
+                       grid_length=1, contain_solute=False, show=True, 
+                       transpose=False, stream_plot=False, **kwargs):
+        '''
+        Show the velocity field in given plane.
+        
+        Parameters
+        ----------
+            plane: str
+                The plane to visualize.
+            dim: array like 
+                The alias of plane which must have length with 3
+            loc: float
+                The location of plane.
+            agg_method: function
+                The method to aggregate the velocity in each grid.
+            grid_length: float
+                The length of grid.
+            contain_solute: bool
+                Whether to contain solute particles.
+            transpose: bool
+                Whether to transpose the velocity field.
+            show: bool
+                Whether to show the velocity field.
+            stream_plot: bool
+                Whether to use stream plot to show the velocity field.
+            kwargs: dict
+                kwargs for plot.
+        
+        Returns
+        -------
+            (alist, blist): tuple
+                The locations of grids.
+            (valist, vblist): tuple
+                The velocity field.
+        '''
+        if plane == 'xoy':
+            dim = [0, 1, 2]
+        elif plane == 'yoz':
+            dim = [1, 2, 0]
+        elif plane == 'xoz':
+            dim = [0, 2, 1]
+
+        grid = self.Grid3d
+        if self.Grid3d.grid_length != grid_length:
+            grid = Grid3D(geometry=self.geometry, grid_length=grid_length)
+        grid.center_zero()
+        
+        posi, velo = self.fluid.position, self.fluid.velocity
+        if contain_solute:
+            posi = np.vstack([posi, self.solute.position])
+            velo = np.vstack([velo, self.solute.velocity])
+
+        if loc is not None:
+            select = np.where((posi[:,dim[2]]<loc+grid_length/2) & 
+                              (posi[:,dim[2]]>=loc-grid_length/2))
+            posi = posi[select]
+            velo = velo[select]
+        
+        grid_centers, posi_ids = grid.scatter_points(posi, dim=dim[:2])
+        alist, blist = grid_centers[:,0], grid_centers[:,1]
+        velo_res = np.array([agg_method(velo[ids], axis=0) for ids in posi_ids])
+        valist, vblist = velo_res[:,dim[0]], velo_res[:,dim[1]]
+        if show:
+            print(f'Show velocity field in {plane} plane ...')
+            if not stream_plot:
+                if transpose:
+                    plt.quiver(blist, alist, vblist, valist, **kwargs)
+                else:
+                    plt.quiver(alist, blist, valist, vblist, **kwargs)
+                plt.show()
+            else:
+                als = np.unique(alist)
+                bls = np.unique(blist)
+
+                x = alist.reshape(-1, len(bls)).T
+                y = blist.reshape(len(als), -1).T
+                u = valist.reshape(-1, len(bls)).T
+                v = vblist.reshape(len(als), -1).T
+                if transpose:
+                    x, y, u, v = y.T, x.T, v.T, u.T
+                plt.streamplot(x, y, u, v, **kwargs)
+        return (alist, blist), (valist, vblist) 
+
+
+    def old_velocity_field(self, plane='xoy', loc=None, grid_length=1, contain_solute=False, transpose=False, show=True):
         '''
         Show the velocity field in given plane.
         
@@ -521,7 +608,7 @@ class Visualize(object):
         else:
             return alist, blist, valist, vblist
     
-    def velocity_distribution(self, bins=100, axis='x'):
+    def velocity_distribution(self, axis='x', bins=100):
         '''
         Show the velocity distribution.
         
@@ -549,7 +636,7 @@ class Visualize(object):
         plt.hist(vs, bins)
         plt.show()
 
-    def velocity_profile(self, plane='xoz', plane_loc=None, loc_cross=0.0, grid_length=1, dim=1):
+    def velocity_profile(self, plane='xoz', plane_loc=None, agg_method=np.nansum, loc_cross=0.0, grid_length=1, dim=1):
         '''
         Get the velocity profile in given plane.
         
@@ -573,17 +660,18 @@ class Visualize(object):
             vs: numpy.ndarray
                 The velocity profile.
         '''
-        alist, blist, valist, vblist=self.velocity_field(plane, plane_loc, grid_length, show=False)
+        (alist, blist), (valist, vblist)=self.velocity_field(plane=plane, loc=plane_loc, agg_method=agg_method,
+                                                             grid_length=grid_length, show=False)
         als, nas = np.unique(alist, return_counts=True)
         bls, nbs = np.unique(blist, return_counts=True)
         if dim==0:
             locs = bls
             vs = valist.reshape(nas[0], nbs[0])
-            vs = np.mean(vs, axis=1)
+            vs = np.nanmean(vs, axis=1)
         elif dim==1:
             locs = als
             vs = vblist.reshape(nbs[0], nas[0])
-            vs = np.mean(vs, axis=1)
+            vs = np.nanmean(vs, axis=1)
         plt.plot(locs, vs)
         plt.show()
         return locs, vs
